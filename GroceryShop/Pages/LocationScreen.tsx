@@ -1,8 +1,26 @@
-import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
+import React, { useState } from 'react';
+import {StyleSheet, View, Text, TouchableOpacity, Image, TextInput} from 'react-native';
 import fruit from '../Images/fruits.png';
+import { Modal } from 'antd';
+import { MaterialDialog } from 'react-native-material-dialog';
 
-const LocationScreen = () => {
+
+const LocationScreen:React.FC = () => {
+const [isVisibleLocation, setVisibleLocation] = useState(false)
+const [isVisiblePostal, setVisiblePostal] = useState(false)
+const [isVisible, setVisible] = useState(false)
+
+const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleOk = () => {
+    setVisible(false);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
   return (
     <View style={styles.container}>
       <Image style={styles.img} source={fruit}></Image>
@@ -11,17 +29,34 @@ const LocationScreen = () => {
       Find the latest deals at stores near you.
       </Text>
 
-      <TouchableOpacity style={styles.locationButton}>
+      <TouchableOpacity onPress={()=>setVisibleLocation(true)} style={styles.locationButton}>
         <View>
           <Text style={styles.lButtonText}>Set Location</Text>
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.postalButton}>
+      <TouchableOpacity style={styles.postalButton} onPress={()=>setVisiblePostal(true)}>
         <View>
           <Text style={styles.pButtonText}>Enter Postal Code</Text>
         </View>
       </TouchableOpacity>
+      <MaterialDialog
+  title="Use Google's Location Service?"
+  visible={isVisibleLocation}
+  onOk={() => setVisibleLocation(false)}
+  onCancel={() => setVisibleLocation(false)}>
+  <Text >
+    Let Google help apps determine location. This means sending anonymous
+    location data to Google, even when no apps are running.
+  </Text>
+</MaterialDialog>
+<MaterialDialog
+  title="Set Your Postal Code"
+  visible={isVisiblePostal}
+  onOk={() => setVisiblePostal(false)}
+  onCancel={() => setVisiblePostal(false)}>
+  <TextInput placeholder='Postal Code'/>
+</MaterialDialog>
     </View>
   );
 };
