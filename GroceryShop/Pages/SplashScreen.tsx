@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
-import logo from '../Images/logo2.png';
+import logo from '../assets/logo2.png';
 
 const SplashScreen = ({navigation}) => {
   return (

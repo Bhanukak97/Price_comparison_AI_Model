@@ -1,0 +1,42 @@
+export const GroceryList = [
+    {
+        id:1,
+        name:"Walmart",
+        Image:require("../assets/walmart.png"),
+    },
+    {
+        id:2,
+        name:"Shoppers Drug Mart",
+        Image:require("../assets/shoppers.png"),
+    },
+    {
+        id:3,
+        name:"No Frills",
+        Image:require("../assets/nofrill.jpg"),
+    },
+    {
+        id:4,
+        name:"FreshCo",
+        Image:require("../assets/freshco.png"),
+    },
+    {
+        id:5,
+        name:"Metro",
+        Image:require("../assets/metro.png"),
+    },
+    {
+        id:6,
+        name:"Sobeys",
+        Image:require("../assets/sobeys.png"),
+    },
+    {
+        id:7,
+        name:"Loblaws",
+        Image:require("../assets/loblaws2.png"),
+    },
+    {
+        id:8,
+        name:"Costco",
+        Image:require("../assets/costco.png"),
+    }
+]
