@@ -1,25 +1,78 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   StyleSheet,
   View,
-  Text,
-  TouchableOpacity,
   Image,
   TextInput,
+  FlatList,
+  ScrollView,
 } from 'react-native';
-import fruit from '../assets/fruits.png';
-import {MaterialDialog} from 'react-native-material-dialog';
+import VerticalCards from '../Components/VerticalCards';
+import HorizontalCards from '../Components/HorozontalCards';
+import {RecommendList} from '../Components/RecommendList';
+import {ProductList} from '../Components/ProductList';
 
 const HomeScreen: React.FC = ({navigation}) => {
-  const [isVisibleLocation, setVisibleLocation] = useState(false);
-  const [isVisiblePostal, setVisiblePostal] = useState(false);
-  const [locationText, setLocationText] = useState('');
   return (
-    <View style={styles.container}>
-      <View style={styles.topHeader}>
-
+    <>
+      <View style={styles.container}>
+        <View style={styles.topHeader}>
+          <TextInput
+            placeholderTextColor={'#fff'}
+            style={styles.input}
+            placeholder="Search products or store"
+          />
+          <View style={styles.imageContainer}>
+            <Image
+              style={styles.topImg}
+              source={require('../assets/photo.jpg')}
+            />
+            <Image
+              style={styles.topImg}
+              source={require('../assets/upload.jpg')}
+            />
+          </View>
+        </View>
+        <View>
+          <FlatList
+            horizontal
+            data={RecommendList}
+            numColumns={1}
+            keyExtractor={(item, index) => String(item.id)}
+            renderItem={({item}) => (
+              <ScrollView style={{padding: 10}}>
+                <VerticalCards
+                  text={item.name}
+                  price={item.price}
+                  offer={item.offer}
+                  imageLink={require('../assets/gallery.png')}
+                />
+              </ScrollView>
+            )}
+          />
+        </View>
+        <ScrollView>
+          <View style={{justifyContent: 'center', alignItems: 'center'}}>
+            <FlatList
+              scrollEnabled={false}
+              data={ProductList}
+              numColumns={3}
+              keyExtractor={(item, index) => String(item.id)}
+              renderItem={({item}) => (
+                <View style={{padding: 5}}>
+                  <HorizontalCards
+                    name={item.name}
+                    price={item.price}
+                    description={item.description}
+                    imageLink={require('../assets/gallery-gray.png')}
+                  />
+                </View>
+              )}
+            />
+          </View>
+        </ScrollView>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -27,14 +80,27 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#fff',
-    // padding: 32,
+  },
+  input: {
+    backgroundColor: '#153075',
+    borderRadius: 10,
+    width: '80%',
+    textAlign: 'center',
+  },
+  imageContainer: {
+    flexDirection: 'row',
+    paddingTop: 20,
   },
   img: {
     width: 300,
     height: 300,
+  },
+  topImg: {
+    width: 68,
+    height: 68,
+    borderRadius: 100,
+    margin: 10,
   },
   maintext: {
     color: '#fff',
@@ -50,10 +116,11 @@ const styles = StyleSheet.create({
     width: 250,
     marginTop: 50,
   },
-  topHeader:{
-backgroundColor:'#2A4BA0',
-height:250,
-width:'100%'
+  topHeader: {
+    backgroundColor: '#2A4BA0',
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   locationButton: {
     backgroundColor: '#fff',

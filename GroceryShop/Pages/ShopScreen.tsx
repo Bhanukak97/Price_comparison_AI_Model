@@ -20,7 +20,7 @@ const ShopScreen = ({navigation}) => {
       />
        <TouchableOpacity
         style={styles.continueButton}
-        onPress={() => navigation.navigate("Home")}>
+        onPress={() => navigation.navigate("home")}>
           <Text style={styles.pButtonText}>Continue</Text>
       </TouchableOpacity>
     </View>

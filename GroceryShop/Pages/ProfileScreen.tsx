@@ -1,31 +1,22 @@
 import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
-import logo from '../assets/logo2.png';
+import {StyleSheet, View, Text} from 'react-native';
 
-const SplashScreen = ({navigation}) => {
+const ProfileScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <Image style={styles.img} source={logo}></Image>
-      <Text style={styles.maintext}>Your easy Price Comparison App.</Text>
+      
       <Text style={styles.description}>
-        Search, compare prices, and find the best offers at stores near you.
-      </Text>
+Profile Page      </Text>
 
-      <TouchableOpacity style={styles.menuButton} onPress={()=>navigation.navigate('location')}>
-        <View>
-          <Text>Get Started</Text>
-        </View>
-      </TouchableOpacity>
+      
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
     width: '100%',
     height: '100%',
-    // display:"flex",
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#2A4BA0',
@@ -62,4 +53,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SplashScreen;
+export default ProfileScreen;
