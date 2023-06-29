@@ -50,7 +50,7 @@ const LocationScreen: React.FC = ({navigation}) => {
       <MaterialDialog
         title="Set Your Postal Code"
         visible={isVisiblePostal}
-        onOk={() => {locationText? navigation.navigate("Shops"):null}}
+        onOk={() => {locationText? navigation.navigate("shops"):null}}
         onCancel={() => setVisiblePostal(false)}>
         <TextInput
           onChangeText={e => {
