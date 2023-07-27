@@ -11,7 +11,7 @@ const SplashScreen = ({navigation}) => {
         Search, compare prices, and find the best offers at stores near you.
       </Text>
 
-      <TouchableOpacity style={styles.menuButton} onPress={()=>navigation.navigate('location')}>
+      <TouchableOpacity style={styles.menuButton} onPress={()=>navigation.navigate('shops')}>
         <View>
           <Text>Get Started</Text>
         </View>
