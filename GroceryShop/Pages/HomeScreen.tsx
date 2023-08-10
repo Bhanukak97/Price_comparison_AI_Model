@@ -16,24 +16,98 @@ import {ProductList} from '../Components/ProductList';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
 import { PermissionsAndroid } from 'react-native';
-import Item from 'antd/es/list/Item';
+import { ref, get, child, query, startAt, endAt } from "firebase/database";
+import { database } from "../Firebase/firebase";
+import { Height } from '@mui/icons-material';
 
-const HomeScreen: React.FC = ({navigation}) => {
-  const [selectedImage, setSelectedImage] = useState(null);
+const HomeScreen: React.FC = () => {
+  const [selectedImage, setSelectedImage] = useState({});
   const [apiResult, setApiResult] = useState([]);
   const [galleryPermission, setGalleryPermission] = useState('denied');
-  const[searchText,setSearchText] = useState('')
+  const [vegetables,setVegitables] = useState([])
+  const [searchText, setSearchText] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  console.log("🚀 ~ file: HomeScreen.tsx:28 ~ vegetables:", vegetables)
 
   useEffect(() => {
     checkGalleryPermission();
   }, []);
 
   // useEffect(() => {
-  //   apiResult.map((label) => (
-  //     setSearchText(label.description)
-  //   ))
-  //   console.log("api result",apiResult)
-  // },[apiResult.length])
+  //   const vegetableRef = ref(database, "vegetables");
+  //   const milkRef = ref(database, "milk");
+  //   const meatRef = ref(database, "meats");
+  //   const fruitRef = ref(database, "fruits");
+
+
+  //   onValue(vegetableRef, (snapshot) => {
+  //     const data = snapshot.val();
+  //     console.log("🚀 ~ file: HomeScreen.tsx:41 ~ onValue ~ data:", data)
+    
+  //     if (data) {
+  //       const transformedData = Object.keys(data).map((key) => ({
+  //         id:data[key].id,
+  //         name: data[key].name,
+  //         price: data[key].price,
+  //         image: data[key].image,
+  //       }));
+  //       setVegitables(transformedData);
+  //     }
+  //   });
+  // }, [searchText]);
+  const vegetableRef = ref(database, "vegetables");
+    const milkRef = ref(database, "milk");
+    const meatRef = ref(database, "meats");
+    const fruitRef = ref(database, "fruits");
+
+    const handleSearch = async () => {
+      if (!searchText.trim()) {
+        setSearchResults([]);
+        return;
+      }
+  
+      const searchWords = searchText.toLowerCase().split(' ');
+  
+      const results = await Promise.all([
+        searchInTable(vegetableRef, 'vegetables', searchWords),
+        searchInTable(milkRef, 'milk', searchWords),
+        searchInTable(meatRef, 'meats', searchWords),
+        searchInTable(fruitRef, 'fruits', searchWords),
+      ]);
+      console.log("🚀 ~ file: HomeScreen.tsx:76 ~ handleSearch ~ results:", results)
+  
+    
+      const combinedResults = results.reduce((acc, cur) => acc.concat(cur), []);
+  
+      setVegitables(combinedResults);
+    };
+  
+    const searchInTable = async (tableRef:any, tableName:any, searchWords:any) => {
+      const result:any = [];
+    
+      const snapshot = await get(tableRef);
+    
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+    
+        Object.keys(data).forEach((key) => {
+          const item = data[key];
+          const itemName = item.name.toLowerCase();
+    
+          // Check if any search word matches the item name
+          if (searchWords.some((word:any) => itemName.includes(word))) {
+            result.push({
+              id: key,
+              tableName,
+              ...item,
+            });
+          }
+        });
+      }
+    
+      return result;
+    };
+
 
   const checkGalleryPermission = async () => {
     try {
@@ -71,7 +145,7 @@ const HomeScreen: React.FC = ({navigation}) => {
     }
   };
 
-  const recognizeImage = async (base64Image) => {
+  const recognizeImage = async (base64Image:any) => {
     try {
       const API_KEY = 'AIzaSyC5fqa9oM0Em1HCT0GAJjnaDdrLK1cifYY';
       const API_URL = `https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}`;
@@ -87,38 +161,52 @@ const HomeScreen: React.FC = ({navigation}) => {
           },
         ],
       };
+
   
       const response = await axios.post(API_URL, requestBody);
   
-      const textDetectionResults = response.data.responses[0]?.textAnnotations || [];
-      const objectLocalizationResults = response.data.responses[0]?.localizedObjectAnnotations || [];
-       if(textDetectionResults){
-        textSelection(textDetectionResults)
-       }else{
-        textSelection(objectLocalizationResults)
-       }
-      console.log('Text Detection Results:', textDetectionResults);
-      console.log('Object Localization Results:', objectLocalizationResults);
+      // const textDetectionResults = response.data.responses[0]?.textAnnotations || [];
+      // const objectLocalizationResults = response.data.responses[0]?.localizedObjectAnnotations || [];
+      // if (textDetectionResults.length !== 0 || objectLocalizationResults.length !== 0) {
+      //   textSelection(textDetectionResults.length !== 0 ? textDetectionResults : objectLocalizationResults);
+      // }
+      // console.log('Text Detection Results:', textDetectionResults);
+      // console.log('Object Localization Results:', objectLocalizationResults);
+      if (response && response.data && response.data.responses) {
+        const textDetectionResults = response.data.responses[0]?.textAnnotations || [];
+        const objectLocalizationResults = response.data.responses[0]?.localizedObjectAnnotations || [];
+      
+        if (textDetectionResults.length !== 0) {
+          textSelection(textDetectionResults, true); 
+        } else if (objectLocalizationResults.length !== 0) {
+          textSelection(objectLocalizationResults, false); 
+        } else {
+         
+        }
+      }
      
-    } catch (error) {
+    } catch (error:any) {
       console.log('Google Cloud Vision API Error:', error.response.data.error);
     }
   };
 
-  const textSelection=(text) => {
-    const product_name = ["rice", "basmati", "milk", "neilson"];
-  const uniqueMatchingTexts = new Set();
-
-  text.map((item) => {
-    const lowerCaseText = item.description.toLowerCase();
-    const matchingProducts = product_name.filter((product) => lowerCaseText.includes(product));
-    matchingProducts.forEach((product) => uniqueMatchingTexts.add(product)); 
-  });
-
-  const matchingTextArray = Array.from(uniqueMatchingTexts); 
-  setSearchText(matchingTextArray[1]+" "+matchingTextArray[0])
+  const handleImageChange = (value:any) => {
+    setSearchText(value);
+  };
+  const textSelection = (text:any, isTextDetection:boolean) => {
+    const product_names = ["rice", "basmati", "milk", "neilson", "tomato","orange","potato","lettuce","banana","chiken",];
+    const uniqueMatchingTexts = new Set();
   
-  }
+    text.map((item:any) => {
+      const lowerCaseText = isTextDetection ? item.description.toLowerCase() : item.name.toLowerCase();
+      const matchingProducts = product_names.filter((product) => lowerCaseText.includes(product));
+      matchingProducts.forEach((product) => uniqueMatchingTexts.add(product));
+    });
+  
+    const matchingTextArray = Array.from(uniqueMatchingTexts);
+  
+    setSearchText(matchingTextArray.join(" "));
+  };
   
   return (
     <>
@@ -129,12 +217,16 @@ const HomeScreen: React.FC = ({navigation}) => {
             placeholderTextColor={'#fff'}
             style={styles.input}
             placeholder="Search products or store"
+            onChangeText={handleImageChange}
           />
+          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Text style={styles.searchButtonText}>search</Text>
+        </TouchableOpacity>
           <View style={styles.imageContainer}>
-            <Image
+            {/* <Image
               style={styles.topImg}
               source={require('../assets/photo.jpg')}
-            />
+            /> */}
              <TouchableOpacity onPress={handleImagePicker}>
              <Image
               style={styles.topImg}
@@ -145,7 +237,7 @@ const HomeScreen: React.FC = ({navigation}) => {
           </View>
         </View>
         <View>
-          <FlatList
+          {/* <FlatList
             horizontal
             data={RecommendList}
             numColumns={1}
@@ -160,7 +252,7 @@ const HomeScreen: React.FC = ({navigation}) => {
                 />
               </ScrollView>
             )}
-          />
+          /> */}
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       {/* {selectedImage && (
         <Image source={selectedImage} style={{ width: 200, height: 200, marginBottom: 20 }} />
@@ -183,14 +275,14 @@ const HomeScreen: React.FC = ({navigation}) => {
           <Text>Select Image</Text>
         </TouchableOpacity>
       )}
-     
+      
     </View>
         </View>
         <ScrollView>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
             <FlatList
               scrollEnabled={false}
-              data={ProductList}
+              data={vegetables}
               numColumns={3}
               keyExtractor={(item, index) => String(item.id)}
               renderItem={({item}) => (
@@ -198,8 +290,7 @@ const HomeScreen: React.FC = ({navigation}) => {
                   <HorizontalCards
                     name={item.name}
                     price={item.price}
-                    description={item.description}
-                    imageLink={require('../assets/gallery-gray.png')}
+                    imageLink={item.image}
                   />
                 </View>
               )}
@@ -289,6 +380,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  searchButton:{
+    backgroundColor:"#fff",
+    Height:30,
+    width:80,
+    color:"#000",
+    marginTop:20,
+    borderRadius:5,
+    padding:5,
+  },
+  searchButtonText:{
+    textAlign:"center",
+    color:"#000"
+  }
 });
 
 export default HomeScreen;

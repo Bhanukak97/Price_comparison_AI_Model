@@ -9,6 +9,7 @@ import HomeScreen from './Pages/HomeScreen';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ProfileScreen from './Pages/ProfileScreen';
+import AddData from './Pages/dataadding';
 
 const Tab = createBottomTabNavigator();
 
@@ -51,6 +52,7 @@ function App(): JSX.Element {
         <Tab.Screen name="location" component={LocationScreen} />
         <Stack.Screen name="shops" component={ShopScreen} />
         <Stack.Screen name="home" component={HomeTabs} />
+        <Stack.Screen name="add" component={AddData} />
       </Stack.Navigator>
     </NavigationContainer>
   );

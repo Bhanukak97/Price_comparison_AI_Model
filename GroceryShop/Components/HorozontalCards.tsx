@@ -23,7 +23,7 @@ const HorizontalCards: React.FC<Props> = (props: Props) => {
     <View style={styles.container}>
       <View style={styles.middle}>
         <View style={styles.imgWrapper}>
-          <Image style={styles.img} source={props.imageLink} />
+          <Image style={styles.img} source={{uri:props.imageLink}} />
         </View>
         <View style={{borderColor:"#E0E2EE", borderWidth:0.5, marginTop:10}}/>
         <View style={styles.TextContainer}>
